@@ -21,8 +21,8 @@ delete_metadata( 'user', 0, 'cleanup_kit_columns', '', true );
 delete_metadata( 'user', 0, 'cleanup_kit_per_page', '', true );
 
 // 3. Recursively remove the log directory using WP_Filesystem.
-$ck_upload_dir = wp_upload_dir();
-$ck_log_dir    = trailingslashit( $ck_upload_dir['basedir'] ) . 'cleanup-kit-logs';
+$cleanup_kit_upload_dir = wp_upload_dir();
+$cleanup_kit_log_dir    = trailingslashit( $cleanup_kit_upload_dir['basedir'] ) . 'cleanup-kit-logs';
 
 global $wp_filesystem;
 if ( empty( $wp_filesystem ) ) {
@@ -30,6 +30,6 @@ if ( empty( $wp_filesystem ) ) {
 	WP_Filesystem();
 }
 
-if ( $wp_filesystem->is_dir( $ck_log_dir ) ) {
-	$wp_filesystem->delete( $ck_log_dir, true );
+if ( $wp_filesystem->is_dir( $cleanup_kit_log_dir ) ) {
+	$wp_filesystem->delete( $cleanup_kit_log_dir, true );
 }

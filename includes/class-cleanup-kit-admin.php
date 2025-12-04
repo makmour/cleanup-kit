@@ -72,7 +72,6 @@ class Cleanup_Kit_Admin {
 
 		$valid_keys = [ 'image', 'description', 'slug', 'count' ];
 		
-		// Fix: Unslash before accessing
 		$posted_data = isset( $_POST[ self::OPTION_KEY_COLUMNS ] ) ? wp_unslash( $_POST[ self::OPTION_KEY_COLUMNS ] ) : []; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		
 		$columns_to_save = [];
@@ -184,14 +183,16 @@ class Cleanup_Kit_Admin {
 			$per_page = 20;
 		}
 
-		// Security: Unslash GET variables before sanitization
-		$search_raw  = isset( $_GET['s'] ) ? wp_unslash( $_GET['s'] ) : '';
-		$orderby_raw = isset( $_GET['orderby'] ) ? wp_unslash( $_GET['orderby'] ) : 'name';
-		$order_raw   = isset( $_GET['order'] ) ? wp_unslash( $_GET['order'] ) : 'asc';
+		// Security: Unslash GET variables before sanitization.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$search  = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+		$orderby = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'name';
+		$order   = isset( $_GET['order'] ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'asc';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-		$search  = sanitize_text_field( $search_raw );
-		$orderby = sanitize_text_field( $orderby_raw );
-		$order   = 'desc' === strtolower( sanitize_text_field( $order_raw ) ) ? 'desc' : 'asc';
+		if ( 'desc' !== strtolower( $order ) ) {
+			$order = 'asc';
+		}
 
 		$allowed_orderby = [ 'name', 'slug', 'count', 'description', 'term_id' ];
 		if ( ! in_array( $orderby, $allowed_orderby, true ) ) {
@@ -225,6 +226,14 @@ class Cleanup_Kit_Admin {
 		$categories = get_terms( $args );
 
 		$total_pages = ceil( $total_terms / $per_page );
+		
+		// Setup pagination arguments for paginate_links
+		$pagination_args = [
+			'base'    => add_query_arg( 'paged', '%#%' ),
+			'format'  => '',
+			'current' => $current_page,
+			'total'   => $total_pages,
+		];
 
 		?>
 		<div class="wrap woocommerce">
