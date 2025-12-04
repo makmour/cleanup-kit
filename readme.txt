@@ -1,5 +1,6 @@
 === Cleanup Kit for WooCommerce ===
 Contributors: wprepublic, thewebcitizen
+Donate link: https://wprepublic.com
 Tags: woocommerce, woocommerce cleanup, categories bulk delete, delete woocommerce categories
 Requires at least: 5.8
 Tested up to: 6.4
@@ -72,6 +73,11 @@ No. This plugin is built specifically for WooCommerce products and `product_cat`
 
 All logs are stored in your WordPress uploads directory, inside a folder named `cleanup-kit-logs`. The full path is: `/wp-content/uploads/cleanup-kit-logs/`.
 
+== Screenshots ==
+
+1. **Admin Dashboard:** The main interface allowing you to select categories and choose between Dry Run or Live Cleanup.
+2. **Cleanup Log:** An example of the detailed log file generated after a cleanup process.
+
 == Changelog ==
 
 = 1.0.6 =
@@ -83,3 +89,8 @@ All logs are stored in your WordPress uploads directory, inside a folder named `
 
 = 1.0.0 =
 * Initial release.
+
+== Upgrade Notice ==
+
+= 1.0.6 =
+This version introduces a new search and pagination feature for better category management.
