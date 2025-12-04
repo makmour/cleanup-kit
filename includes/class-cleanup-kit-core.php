@@ -111,7 +111,7 @@ class Cleanup_Kit_Core {
 
 		$this->log( "-> {$log_prefix}delete from wc_product_meta_lookup for product ID {$product_id}." );
 		if ( ! $is_dry_run ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->delete(
 				$wpdb->prefix . 'wc_product_meta_lookup',
 				[ 'product_id' => $product_id ],
@@ -122,7 +122,7 @@ class Cleanup_Kit_Core {
 
 	private function start_log( $is_dry_run ) {
 		$mode                  = $is_dry_run ? 'DRY_RUN' : 'LIVE';
-		$filename              = "cleanup-{$mode}-" . date( 'Y-m-d-His' ) . '.log';
+		$filename              = "cleanup-{$mode}-" . gmdate( 'Y-m-d-His' ) . '.log';
 		$this->log_file_path   = trailingslashit( $this->log_dir ) . $filename;
 		file_put_contents( $this->log_file_path, '' );
 	}

@@ -20,23 +20,16 @@ delete_transient( 'cleanup_kit_last_log' );
 delete_metadata( 'user', 0, 'cleanup_kit_columns', '', true );
 delete_metadata( 'user', 0, 'cleanup_kit_per_page', '', true );
 
-// 3. Recursively remove the log directory.
-$upload_dir = wp_upload_dir();
-$log_dir    = trailingslashit( $upload_dir['basedir'] ) . 'cleanup-kit-logs';
+// 3. Recursively remove the log directory using WP_Filesystem.
+$ck_upload_dir = wp_upload_dir();
+$ck_log_dir    = trailingslashit( $ck_upload_dir['basedir'] ) . 'cleanup-kit-logs';
 
-if ( is_dir( $log_dir ) ) {
-	/**
-	 * Recursively deletes a directory and all its contents.
-	 *
-	 * @param string $dir The directory to delete.
-	 */
-	function cleanup_kit_uninstall_delete_directory( $dir ) {
-		$files = array_diff( scandir( $dir ), array( '.', '..' ) );
-		foreach ( $files as $file ) {
-			is_dir( "$dir/$file" ) ? cleanup_kit_uninstall_delete_directory( "$dir/$file" ) : unlink( "$dir/$file" );
-		}
-		return rmdir( $dir );
-	}
+global $wp_filesystem;
+if ( empty( $wp_filesystem ) ) {
+	require_once ABSPATH . '/wp-admin/includes/file.php';
+	WP_Filesystem();
+}
 
-	cleanup_kit_uninstall_delete_directory( $log_dir );
+if ( $wp_filesystem->is_dir( $ck_log_dir ) ) {
+	$wp_filesystem->delete( $ck_log_dir, true );
 }
