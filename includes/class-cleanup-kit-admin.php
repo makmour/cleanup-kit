@@ -5,15 +5,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Admin UI for the Woo Cleanup plugin.
+ * Admin UI for the Cleanup Kit plugin.
  */
-class Woo_Cleanup_Admin {
+class Cleanup_Kit_Admin {
 
-	const ADMIN_SLUG = 'woo-cleanup';
-	const NONCE_ACTION = 'woo_cleanup_run_nonce';
-	const FORM_ACTION = 'woo_cleanup_run_form';
-	const OPTION_KEY_COLUMNS = 'woo_cleanup_columns';
-	const OPTION_KEY_PER_PAGE = 'woo_cleanup_per_page';
+	const ADMIN_SLUG = 'cleanup-kit';
+	const NONCE_ACTION = 'cleanup_kit_run_nonce';
+	const FORM_ACTION = 'cleanup_kit_run_form';
+	const OPTION_KEY_COLUMNS = 'cleanup_kit_columns';
+	const OPTION_KEY_PER_PAGE = 'cleanup_kit_per_page';
 
 	private $screen_hook_suffix = null;
 
@@ -28,8 +28,8 @@ class Woo_Cleanup_Admin {
 	public function add_admin_page() {
 		$this->screen_hook_suffix = add_submenu_page(
 			'woocommerce',
-			__( 'Woo Cleanup', 'woo-clean-up' ),
-			__( 'Woo Cleanup', 'woo-clean-up' ),
+			__( 'Cleanup Kit', 'cleanup-kit' ),
+			__( 'Cleanup Kit', 'cleanup-kit' ),
 			'manage_woocommerce',
 			self::ADMIN_SLUG,
 			[ $this, 'render_page' ]
@@ -42,15 +42,13 @@ class Woo_Cleanup_Admin {
 		add_screen_option(
 			'per_page',
 			[
-				'label'   => __( 'Number of items per page:', 'woo-clean-up' ),
+				'label'   => __( 'Number of items per page:', 'cleanup-kit' ),
 				'default' => 20,
 				'option'  => self::OPTION_KEY_PER_PAGE,
 			]
 		);
 
-		// This filter saves the 'per_page' integer automatically
 		add_filter( 'set-screen-option', [ $this, 'save_screen_options' ], 10, 3 );
-		// This filter renders the HTML for checkboxes
 		add_filter( 'screen_settings', [ $this, 'render_screen_options_content' ], 10, 2 );
 	}
 
@@ -58,24 +56,20 @@ class Woo_Cleanup_Admin {
 	 * Saves custom column checkboxes.
 	 */
 	public function save_custom_screen_options() {
-		// 1. Check if the user clicked "Apply" in Screen Options
 		if ( ! isset( $_POST['screen-options-apply'] ) ) {
 			return;
 		}
 
-		// 2. Verify we are on the right page
 		if ( ! isset( $_POST['wp_screen_options']['option'] ) || self::OPTION_KEY_PER_PAGE !== $_POST['wp_screen_options']['option'] ) {
 			return;
 		}
 
-		// 3. Check permissions
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return;
 		}
 
 		check_admin_referer( 'screen-options-nonce', 'screenoptionnonce' );
 
-		// 4. Manually process the columns array to handle unchecked boxes
 		$valid_keys = [ 'image', 'description', 'slug', 'count' ];
 		$posted_columns = isset( $_POST[ self::OPTION_KEY_COLUMNS ] ) ? $_POST[ self::OPTION_KEY_COLUMNS ] : [];
 		$columns_to_save = [];
@@ -109,13 +103,13 @@ class Woo_Cleanup_Admin {
 		$columns = wp_parse_args( $columns, $defaults );
 
 		$html = '<fieldset class="metabox-prefs">';
-		$html .= '<legend>' . __( 'Columns', 'woo-clean-up' ) . '</legend>';
+		$html .= '<legend>' . __( 'Columns', 'cleanup-kit' ) . '</legend>';
 		$html .= '<div class="metabox-prefs-container">';
 		
-		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[image]" value="1" ' . checked( $columns['image'], 1, false ) . ' /> ' . __( 'Image', 'woo-clean-up' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[description]" value="1" ' . checked( $columns['description'], 1, false ) . ' /> ' . __( 'Description', 'woo-clean-up' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[slug]" value="1" ' . checked( $columns['slug'], 1, false ) . ' /> ' . __( 'Slug', 'woo-clean-up' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[count]" value="1" ' . checked( $columns['count'], 1, false ) . ' /> ' . __( 'Count', 'woo-clean-up' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[image]" value="1" ' . checked( $columns['image'], 1, false ) . ' /> ' . __( 'Image', 'cleanup-kit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[description]" value="1" ' . checked( $columns['description'], 1, false ) . ' /> ' . __( 'Description', 'cleanup-kit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[slug]" value="1" ' . checked( $columns['slug'], 1, false ) . ' /> ' . __( 'Slug', 'cleanup-kit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[count]" value="1" ' . checked( $columns['count'], 1, false ) . ' /> ' . __( 'Count', 'cleanup-kit' ) . '</label>';
 		
 		$html .= '</div></fieldset><br class="clear">';
 
@@ -126,7 +120,7 @@ class Woo_Cleanup_Admin {
 		check_admin_referer( self::NONCE_ACTION );
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( __( 'You do not have permission to perform this action.', 'woo-clean-up' ) );
+			wp_die( __( 'You do not have permission to perform this action.', 'cleanup-kit' ) );
 		}
 
 		$term_ids = isset( $_POST['term_ids'] ) ? array_map( 'intval', $_POST['term_ids'] ) : [];
@@ -138,7 +132,7 @@ class Woo_Cleanup_Admin {
 
 		$is_dry_run = isset( $_POST['dry_run'] ) && '1' === $_POST['dry_run'];
 		
-		$core     = new Woo_Cleanup_Core();
+		$core     = new Cleanup_Kit_Core();
 		$log_path = $core->run_cleanup( $term_ids, $is_dry_run );
 
 		$query_args = [
@@ -155,9 +149,6 @@ class Woo_Cleanup_Admin {
 		exit;
 	}
 
-	/**
-	 * Helper to generate sortable column headers.
-	 */
 	private function print_column_header( $id, $title, $current_orderby, $current_order ) {
 		$new_order = 'asc';
 		$sorted_class = '';
@@ -181,7 +172,6 @@ class Woo_Cleanup_Admin {
 	}
 
 	public function render_page() {
-		// 1. Get User Preferences
 		$user_columns = get_user_option( self::OPTION_KEY_COLUMNS );
 		$defaults     = [ 'image' => 1, 'description' => 1, 'slug' => 1, 'count' => 1 ];
 		$columns      = wp_parse_args( $user_columns, $defaults );
@@ -191,12 +181,10 @@ class Woo_Cleanup_Admin {
 			$per_page = 20;
 		}
 
-		// 2. Handle Search & Sort Parameters
 		$search  = isset( $_REQUEST['s'] ) ? sanitize_text_field( $_REQUEST['s'] ) : '';
 		$orderby = isset( $_REQUEST['orderby'] ) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'name';
 		$order   = isset( $_REQUEST['order'] ) && 'desc' === strtolower( $_REQUEST['order'] ) ? 'desc' : 'asc';
 
-		// Validate orderby to prevent errors
 		$allowed_orderby = [ 'name', 'slug', 'count', 'description', 'term_id' ];
 		if ( ! in_array( $orderby, $allowed_orderby, true ) ) {
 			$orderby = 'name';
@@ -205,7 +193,6 @@ class Woo_Cleanup_Admin {
 		$current_page = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
 		$offset       = ( $current_page - 1 ) * $per_page;
 
-		// 3. Prepare Query Arguments
 		$args = [
 			'taxonomy'   => 'product_cat',
 			'hide_empty' => false,
@@ -214,13 +201,10 @@ class Woo_Cleanup_Admin {
 			'order'      => $order,
 		];
 
-		// 4. Fetch Data & Counts
-		// First, get the total count for pagination (accounting for search)
 		$count_args = $args;
 		$count_args['fields'] = 'count';
 		$total_terms = get_terms( $count_args ); 
 		
-		// Fallback for empty/error results
 		if ( is_wp_error( $total_terms ) ) {
 			$total_terms = 0;
 		}
@@ -228,7 +212,6 @@ class Woo_Cleanup_Admin {
 			$total_terms = count( $total_terms );
 		}
 
-		// Now fetch the actual slice of data
 		$args['number'] = $per_page;
 		$args['offset'] = $offset;
 		$categories = get_terms( $args );
@@ -237,8 +220,8 @@ class Woo_Cleanup_Admin {
 
 		?>
 		<div class="wrap woocommerce">
-			<h1 class="wp-heading-inline"><?php esc_html_e( 'WooCommerce Category Cleanup', 'woo-clean-up' ); ?></h1>
-			<p><?php esc_html_e( 'Select categories to permanently delete products and clean up orphaned data.', 'woo-clean-up' ); ?></p>
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Cleanup Kit for WooCommerce', 'cleanup-kit' ); ?></h1>
+			<p><?php esc_html_e( 'Select categories to permanently delete products and clean up orphaned data.', 'cleanup-kit' ); ?></p>
 			<hr class="wp-header-end">
 
 			<?php if ( isset( $_GET['message'] ) && 'success' === $_GET['message'] ) : ?>
@@ -246,19 +229,19 @@ class Woo_Cleanup_Admin {
 					<p>
 						<?php 
 						if ( isset( $_GET['mode'] ) && 'dry_run' === $_GET['mode'] ) {
-							esc_html_e( 'Dry Run Complete. No data was deleted.', 'woo-clean-up' );
+							esc_html_e( 'Dry Run Complete. No data was deleted.', 'cleanup-kit' );
 						} else {
-							esc_html_e( 'Cleanup Complete.', 'woo-clean-up' );
+							esc_html_e( 'Cleanup Complete.', 'cleanup-kit' );
 						}
 						?>
 						<?php if ( isset( $_GET['log'] ) ) : ?>
-							<a href="<?php echo esc_url( content_url( 'uploads/woo-clean-up-logs/' . urldecode( $_GET['log'] ) ) ); ?>" target="_blank" class="button button-small"><?php esc_html_e( 'View Log', 'woo-clean-up' ); ?></a>
+							<a href="<?php echo esc_url( content_url( 'uploads/cleanup-kit-logs/' . urldecode( $_GET['log'] ) ) ); ?>" target="_blank" class="button button-small"><?php esc_html_e( 'View Log', 'cleanup-kit' ); ?></a>
 						<?php endif; ?>
 					</p>
 				</div>
 			<?php elseif ( isset( $_GET['message'] ) && 'no_selection' === $_GET['message'] ) : ?>
 				<div class="notice notice-warning is-dismissible">
-					<p><?php esc_html_e( 'Please select at least one category.', 'woo-clean-up' ); ?></p>
+					<p><?php esc_html_e( 'Please select at least one category.', 'cleanup-kit' ); ?></p>
 				</div>
 			<?php endif; ?>
 
@@ -268,9 +251,9 @@ class Woo_Cleanup_Admin {
 					<input type="hidden" name="paged" value="<?php echo esc_attr( $_GET['paged'] ); ?>" />
 				<?php endif; ?>
 				<p class="search-box">
-					<label class="screen-reader-text" for="tag-search-input"><?php esc_html_e( 'Search Categories:', 'woo-clean-up' ); ?></label>
+					<label class="screen-reader-text" for="tag-search-input"><?php esc_html_e( 'Search Categories:', 'cleanup-kit' ); ?></label>
 					<input type="search" id="tag-search-input" name="s" value="<?php echo esc_attr( $search ); ?>">
-					<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Categories', 'woo-clean-up' ); ?>">
+					<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Categories', 'cleanup-kit' ); ?>">
 				</p>
 			</form>
 
@@ -278,24 +261,16 @@ class Woo_Cleanup_Admin {
 				<input type="hidden" name="action" value="<?php echo esc_attr( self::FORM_ACTION ); ?>">
 				<?php wp_nonce_field( self::NONCE_ACTION ); ?>
 
-				<?php
-				$pagination_args = [
-					'base'    => add_query_arg( 'paged', '%#%' ),
-					'format'  => '',
-					'total'   => $total_pages,
-					'current' => $current_page,
-				];
-				?>
 				<div class="tablenav top">
 					<div class="alignleft actions bulkactions">
 						<select name="dry_run">
-							<option value="1"><?php esc_html_e( 'Dry Run (Simulation)', 'woo-clean-up' ); ?></option>
-							<option value="0"><?php esc_html_e( 'Live Cleanup (Delete Data)', 'woo-clean-up' ); ?></option>
+							<option value="1"><?php esc_html_e( 'Dry Run (Simulation)', 'cleanup-kit' ); ?></option>
+							<option value="0"><?php esc_html_e( 'Live Cleanup (Delete Data)', 'cleanup-kit' ); ?></option>
 						</select>
-						<input type="submit" class="button action" value="<?php esc_attr_e( 'Run', 'woo-clean-up' ); ?>">
+						<input type="submit" class="button action" value="<?php esc_attr_e( 'Run', 'cleanup-kit' ); ?>">
 					</div>
 					<div class="tablenav-pages">
-						<span class="displaying-num"><?php echo sprintf( _n( '%s item', '%s items', $total_terms, 'woo-clean-up' ), number_format_i18n( $total_terms ) ); ?></span>
+						<span class="displaying-num"><?php echo sprintf( _n( '%s item', '%s items', $total_terms, 'cleanup-kit' ), number_format_i18n( $total_terms ) ); ?></span>
 						<?php echo paginate_links( $pagination_args ); ?>
 					</div>
 				</div>
@@ -306,28 +281,28 @@ class Woo_Cleanup_Admin {
 							<td id="cb" class="manage-column column-cb check-column"><input type="checkbox" /></td>
 							
 							<?php if ( ! empty( $columns['image'] ) ) : ?>
-								<th scope="col" class="manage-column column-thumb"><span class="wc-image tips"><?php esc_html_e( 'Image', 'woo-clean-up' ); ?></span></th>
+								<th scope="col" class="manage-column column-thumb"><span class="wc-image tips"><?php esc_html_e( 'Image', 'cleanup-kit' ); ?></span></th>
 							<?php endif; ?>
 
 							<th scope="col" class="manage-column column-name column-primary sortable <?php echo ( 'name' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-								<?php $this->print_column_header( 'name', __( 'Name', 'woo-clean-up' ), $orderby, $order ); ?>
+								<?php $this->print_column_header( 'name', __( 'Name', 'cleanup-kit' ), $orderby, $order ); ?>
 							</th>
 
 							<?php if ( ! empty( $columns['description'] ) ) : ?>
 								<th scope="col" class="manage-column column-description sortable <?php echo ( 'description' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'description', __( 'Description', 'woo-clean-up' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'description', __( 'Description', 'cleanup-kit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['slug'] ) ) : ?>
 								<th scope="col" class="manage-column column-slug sortable <?php echo ( 'slug' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'slug', __( 'Slug', 'woo-clean-up' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'slug', __( 'Slug', 'cleanup-kit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['count'] ) ) : ?>
 								<th scope="col" class="manage-column column-posts num sortable <?php echo ( 'count' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'count', __( 'Count', 'woo-clean-up' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'count', __( 'Count', 'cleanup-kit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 						</tr>
@@ -350,10 +325,10 @@ class Woo_Cleanup_Admin {
 										<td class="thumb column-thumb"><?php echo $image; ?></td>
 									<?php endif; ?>
 
-									<td class="name column-name" data-colname="<?php esc_attr_e( 'Name', 'woo-clean-up' ); ?>">
+									<td class="name column-name" data-colname="<?php esc_attr_e( 'Name', 'cleanup-kit' ); ?>">
 										<strong><a href="<?php echo esc_url( get_term_link( $category ) ); ?>" target="_blank" class="row-title"><?php echo esc_html( $category->name ); ?></a></strong>
 										<div class="row-actions">
-											<span class="view"><a href="<?php echo esc_url( get_term_link( $category ) ); ?>" target="_blank"><?php esc_html_e( 'View', 'woo-clean-up' ); ?></a></span>
+											<span class="view"><a href="<?php echo esc_url( get_term_link( $category ) ); ?>" target="_blank"><?php esc_html_e( 'View', 'cleanup-kit' ); ?></a></span>
 											<span class="id">ID: <?php echo esc_html( $category->term_id ); ?></span>
 										</div>
 									</td>
@@ -375,7 +350,7 @@ class Woo_Cleanup_Admin {
 						} else {
 							?>
 							<tr>
-								<td colspan="6"><?php esc_html_e( 'No categories found.', 'woo-clean-up' ); ?></td>
+								<td colspan="6"><?php esc_html_e( 'No categories found.', 'cleanup-kit' ); ?></td>
 							</tr>
 							<?php
 						}
@@ -386,28 +361,28 @@ class Woo_Cleanup_Admin {
 							<td class="manage-column column-cb check-column"><input type="checkbox" /></td>
 							
 							<?php if ( ! empty( $columns['image'] ) ) : ?>
-								<th scope="col" class="manage-column column-thumb"><?php esc_html_e( 'Image', 'woo-clean-up' ); ?></th>
+								<th scope="col" class="manage-column column-thumb"><?php esc_html_e( 'Image', 'cleanup-kit' ); ?></th>
 							<?php endif; ?>
 
 							<th scope="col" class="manage-column column-name column-primary sortable <?php echo ( 'name' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-								<?php $this->print_column_header( 'name', __( 'Name', 'woo-clean-up' ), $orderby, $order ); ?>
+								<?php $this->print_column_header( 'name', __( 'Name', 'cleanup-kit' ), $orderby, $order ); ?>
 							</th>
 
 							<?php if ( ! empty( $columns['description'] ) ) : ?>
 								<th scope="col" class="manage-column column-description sortable <?php echo ( 'description' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'description', __( 'Description', 'woo-clean-up' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'description', __( 'Description', 'cleanup-kit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['slug'] ) ) : ?>
 								<th scope="col" class="manage-column column-slug sortable <?php echo ( 'slug' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'slug', __( 'Slug', 'woo-clean-up' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'slug', __( 'Slug', 'cleanup-kit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['count'] ) ) : ?>
 								<th scope="col" class="manage-column column-posts num sortable <?php echo ( 'count' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'count', __( 'Count', 'woo-clean-up' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'count', __( 'Count', 'cleanup-kit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 						</tr>
@@ -416,7 +391,7 @@ class Woo_Cleanup_Admin {
 
 				<div class="tablenav bottom">
 					<div class="tablenav-pages">
-						<span class="displaying-num"><?php echo sprintf( _n( '%s item', '%s items', $total_terms, 'woo-clean-up' ), number_format_i18n( $total_terms ) ); ?></span>
+						<span class="displaying-num"><?php echo sprintf( _n( '%s item', '%s items', $total_terms, 'cleanup-kit' ), number_format_i18n( $total_terms ) ); ?></span>
 						<?php echo paginate_links( $pagination_args ); ?>
 					</div>
 				</div>

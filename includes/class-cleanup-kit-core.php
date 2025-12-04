@@ -7,14 +7,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Core cleanup functionality.
  */
-class Woo_Cleanup_Core {
+class Cleanup_Kit_Core {
 
 	private $log_file_path;
 	private $log_dir;
 
 	public function __construct() {
 		$upload_dir    = wp_upload_dir();
-		$this->log_dir = trailingslashit( $upload_dir['basedir'] ) . 'woo-clean-up-logs';
+		$this->log_dir = trailingslashit( $upload_dir['basedir'] ) . 'cleanup-kit-logs';
 
 		// Create the directory if it doesn't exist.
 		if ( ! file_exists( $this->log_dir ) ) {
