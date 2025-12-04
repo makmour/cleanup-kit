@@ -11,7 +11,7 @@
  * Text Domain:       cleanup-kit
  * Domain Path:       /languages
  * Requires at least: 5.8
- * Tested up to: 6.4
+ * Tested up to: 6.9
  * Requires PHP: 7.4
  * WC requires at least: 6.0
  * WC tested up to: 8.3
