@@ -3,7 +3,7 @@ Contributors: wprepublic, thewebcitizen
 Donate link: https://wprepublic.com
 Tags: woocommerce, woocommerce cleanup, categories bulk delete, delete woocommerce categories
 Requires at least: 5.8
-Tested up to: 6.4
+Tested up to: 6.9
 Requires PHP: 7.4
 Stable tag: 1.0.6
 License: GPL v2 or later
