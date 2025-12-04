@@ -21,7 +21,7 @@ class Cleanup_Kit_Admin {
 		add_action( 'admin_menu', [ $this, 'add_admin_page' ] );
 		add_action( 'admin_post_' . self::FORM_ACTION, [ $this, 'handle_form_submission' ] );
 		
-		// Hook into admin_init to reliably save custom checkboxes
+		// Hook into admin_init to reliably save custom checkboxes.
 		add_action( 'admin_init', [ $this, 'save_custom_screen_options' ] );
 	}
 
@@ -71,11 +71,14 @@ class Cleanup_Kit_Admin {
 		check_admin_referer( 'screen-options-nonce', 'screenoptionnonce' );
 
 		$valid_keys = [ 'image', 'description', 'slug', 'count' ];
-		$posted_columns = isset( $_POST[ self::OPTION_KEY_COLUMNS ] ) ? $_POST[ self::OPTION_KEY_COLUMNS ] : [];
+		
+		// Fix: Unslash before accessing
+		$posted_data = isset( $_POST[ self::OPTION_KEY_COLUMNS ] ) ? wp_unslash( $_POST[ self::OPTION_KEY_COLUMNS ] ) : []; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		
 		$columns_to_save = [];
 
 		foreach ( $valid_keys as $key ) {
-			$columns_to_save[ $key ] = isset( $posted_columns[ $key ] ) ? 1 : 0;
+			$columns_to_save[ $key ] = isset( $posted_data[ $key ] ) ? 1 : 0;
 		}
 
 		update_user_meta( get_current_user_id(), self::OPTION_KEY_COLUMNS, $columns_to_save );
@@ -103,13 +106,13 @@ class Cleanup_Kit_Admin {
 		$columns = wp_parse_args( $columns, $defaults );
 
 		$html = '<fieldset class="metabox-prefs">';
-		$html .= '<legend>' . __( 'Columns', 'cleanup-kit' ) . '</legend>';
+		$html .= '<legend>' . esc_html__( 'Columns', 'cleanup-kit' ) . '</legend>';
 		$html .= '<div class="metabox-prefs-container">';
 		
-		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[image]" value="1" ' . checked( $columns['image'], 1, false ) . ' /> ' . __( 'Image', 'cleanup-kit' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[description]" value="1" ' . checked( $columns['description'], 1, false ) . ' /> ' . __( 'Description', 'cleanup-kit' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[slug]" value="1" ' . checked( $columns['slug'], 1, false ) . ' /> ' . __( 'Slug', 'cleanup-kit' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . self::OPTION_KEY_COLUMNS . '[count]" value="1" ' . checked( $columns['count'], 1, false ) . ' /> ' . __( 'Count', 'cleanup-kit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[image]" value="1" ' . checked( $columns['image'], 1, false ) . ' /> ' . esc_html__( 'Image', 'cleanup-kit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[description]" value="1" ' . checked( $columns['description'], 1, false ) . ' /> ' . esc_html__( 'Description', 'cleanup-kit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[slug]" value="1" ' . checked( $columns['slug'], 1, false ) . ' /> ' . esc_html__( 'Slug', 'cleanup-kit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[count]" value="1" ' . checked( $columns['count'], 1, false ) . ' /> ' . esc_html__( 'Count', 'cleanup-kit' ) . '</label>';
 		
 		$html .= '</div></fieldset><br class="clear">';
 
@@ -120,13 +123,13 @@ class Cleanup_Kit_Admin {
 		check_admin_referer( self::NONCE_ACTION );
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( __( 'You do not have permission to perform this action.', 'cleanup-kit' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'cleanup-kit' ) );
 		}
 
 		$term_ids = isset( $_POST['term_ids'] ) ? array_map( 'intval', $_POST['term_ids'] ) : [];
 
 		if ( empty( $term_ids ) ) {
-			wp_redirect( add_query_arg( 'message', 'no_selection', admin_url( 'admin.php?page=' . self::ADMIN_SLUG ) ) );
+			wp_safe_redirect( add_query_arg( 'message', 'no_selection', admin_url( 'admin.php?page=' . self::ADMIN_SLUG ) ) );
 			exit;
 		}
 
@@ -145,7 +148,7 @@ class Cleanup_Kit_Admin {
 			$query_args['mode'] = 'dry_run';
 		}
 
-		wp_redirect( add_query_arg( $query_args, admin_url( 'admin.php' ) ) );
+		wp_safe_redirect( add_query_arg( $query_args, admin_url( 'admin.php' ) ) );
 		exit;
 	}
 
@@ -181,9 +184,14 @@ class Cleanup_Kit_Admin {
 			$per_page = 20;
 		}
 
-		$search  = isset( $_REQUEST['s'] ) ? sanitize_text_field( $_REQUEST['s'] ) : '';
-		$orderby = isset( $_REQUEST['orderby'] ) ? sanitize_text_field( $_REQUEST['orderby'] ) : 'name';
-		$order   = isset( $_REQUEST['order'] ) && 'desc' === strtolower( $_REQUEST['order'] ) ? 'desc' : 'asc';
+		// Security: Unslash GET variables before sanitization
+		$search_raw  = isset( $_GET['s'] ) ? wp_unslash( $_GET['s'] ) : '';
+		$orderby_raw = isset( $_GET['orderby'] ) ? wp_unslash( $_GET['orderby'] ) : 'name';
+		$order_raw   = isset( $_GET['order'] ) ? wp_unslash( $_GET['order'] ) : 'asc';
+
+		$search  = sanitize_text_field( $search_raw );
+		$orderby = sanitize_text_field( $orderby_raw );
+		$order   = 'desc' === strtolower( sanitize_text_field( $order_raw ) ) ? 'desc' : 'asc';
 
 		$allowed_orderby = [ 'name', 'slug', 'count', 'description', 'term_id' ];
 		if ( ! in_array( $orderby, $allowed_orderby, true ) ) {
@@ -235,7 +243,11 @@ class Cleanup_Kit_Admin {
 						}
 						?>
 						<?php if ( isset( $_GET['log'] ) ) : ?>
-							<a href="<?php echo esc_url( content_url( 'uploads/cleanup-kit-logs/' . urldecode( $_GET['log'] ) ) ); ?>" target="_blank" class="button button-small"><?php esc_html_e( 'View Log', 'cleanup-kit' ); ?></a>
+							<?php
+							// Fix: Unslash and sanitize log filename
+							$log_file = isset( $_GET['log'] ) ? basename( sanitize_text_field( wp_unslash( $_GET['log'] ) ) ) : '';
+							?>
+							<a href="<?php echo esc_url( content_url( 'uploads/cleanup-kit-logs/' . $log_file ) ); ?>" target="_blank" class="button button-small"><?php esc_html_e( 'View Log', 'cleanup-kit' ); ?></a>
 						<?php endif; ?>
 					</p>
 				</div>
@@ -248,7 +260,7 @@ class Cleanup_Kit_Admin {
 			<form method="get">
 				<input type="hidden" name="page" value="<?php echo esc_attr( self::ADMIN_SLUG ); ?>" />
 				<?php if ( isset( $_GET['paged'] ) ) : ?>
-					<input type="hidden" name="paged" value="<?php echo esc_attr( $_GET['paged'] ); ?>" />
+					<input type="hidden" name="paged" value="<?php echo esc_attr( absint( $_GET['paged'] ) ); ?>" />
 				<?php endif; ?>
 				<p class="search-box">
 					<label class="screen-reader-text" for="tag-search-input"><?php esc_html_e( 'Search Categories:', 'cleanup-kit' ); ?></label>
@@ -270,8 +282,19 @@ class Cleanup_Kit_Admin {
 						<input type="submit" class="button action" value="<?php esc_attr_e( 'Run', 'cleanup-kit' ); ?>">
 					</div>
 					<div class="tablenav-pages">
-						<span class="displaying-num"><?php echo sprintf( _n( '%s item', '%s items', $total_terms, 'cleanup-kit' ), number_format_i18n( $total_terms ) ); ?></span>
-						<?php echo paginate_links( $pagination_args ); ?>
+						<span class="displaying-num">
+							<?php
+							printf(
+								/* translators: %s: Number of items */
+								esc_html( _n( '%s item', '%s items', $total_terms, 'cleanup-kit' ) ),
+								esc_html( number_format_i18n( $total_terms ) )
+							);
+							?>
+						</span>
+						<?php 
+						// paginate_links outputs safe HTML
+						echo wp_kses_post( paginate_links( $pagination_args ) ); 
+						?>
 					</div>
 				</div>
 
@@ -322,7 +345,7 @@ class Cleanup_Kit_Admin {
 									<th scope="row" class="check-column"><input type="checkbox" name="term_ids[]" value="<?php echo esc_attr( $category->term_id ); ?>"></th>
 									
 									<?php if ( ! empty( $columns['image'] ) ) : ?>
-										<td class="thumb column-thumb"><?php echo $image; ?></td>
+										<td class="thumb column-thumb"><?php echo wp_kses_post( $image ); ?></td>
 									<?php endif; ?>
 
 									<td class="name column-name" data-colname="<?php esc_attr_e( 'Name', 'cleanup-kit' ); ?>">
@@ -334,7 +357,7 @@ class Cleanup_Kit_Admin {
 									</td>
 
 									<?php if ( ! empty( $columns['description'] ) ) : ?>
-										<td class="description column-description"><?php echo wp_trim_words( $category->description, 15 ); ?></td>
+										<td class="description column-description"><?php echo esc_html( wp_trim_words( $category->description, 15 ) ); ?></td>
 									<?php endif; ?>
 
 									<?php if ( ! empty( $columns['slug'] ) ) : ?>
@@ -391,8 +414,16 @@ class Cleanup_Kit_Admin {
 
 				<div class="tablenav bottom">
 					<div class="tablenav-pages">
-						<span class="displaying-num"><?php echo sprintf( _n( '%s item', '%s items', $total_terms, 'cleanup-kit' ), number_format_i18n( $total_terms ) ); ?></span>
-						<?php echo paginate_links( $pagination_args ); ?>
+						<span class="displaying-num">
+							<?php
+							printf(
+								/* translators: %s: Number of items */
+								esc_html( _n( '%s item', '%s items', $total_terms, 'cleanup-kit' ) ),
+								esc_html( number_format_i18n( $total_terms ) )
+							);
+							?>
+						</span>
+						<?php echo wp_kses_post( paginate_links( $pagination_args ) ); ?>
 					</div>
 				</div>
 
