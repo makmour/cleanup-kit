@@ -184,10 +184,15 @@ class Cleanup_Kit_Admin {
 		}
 
 		// Security: Unslash GET variables before sanitization.
+		// We disable NonceVerification because these variables are used for display logic (search, sort, messages), not data modification.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$search  = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
-		$orderby = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'name';
-		$order   = isset( $_GET['order'] ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'asc';
+		$search    = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+		$orderby   = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'name';
+		$order     = isset( $_GET['order'] ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'asc';
+		$message   = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['message'] ) ) : '';
+		$mode      = isset( $_GET['mode'] ) ? sanitize_text_field( wp_unslash( $_GET['mode'] ) ) : '';
+		$log_file  = isset( $_GET['log'] ) ? basename( sanitize_text_field( wp_unslash( $_GET['log'] ) ) ) : '';
+		$paged_val = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		if ( 'desc' !== strtolower( $order ) ) {
@@ -199,7 +204,7 @@ class Cleanup_Kit_Admin {
 			$orderby = 'name';
 		}
 
-		$current_page = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
+		$current_page = $paged_val;
 		$offset       = ( $current_page - 1 ) * $per_page;
 
 		$args = [
@@ -241,26 +246,22 @@ class Cleanup_Kit_Admin {
 			<p><?php esc_html_e( 'Select categories to permanently delete products and clean up orphaned data.', 'cleanup-kit' ); ?></p>
 			<hr class="wp-header-end">
 
-			<?php if ( isset( $_GET['message'] ) && 'success' === $_GET['message'] ) : ?>
+			<?php if ( 'success' === $message ) : ?>
 				<div class="notice notice-success is-dismissible">
 					<p>
 						<?php 
-						if ( isset( $_GET['mode'] ) && 'dry_run' === $_GET['mode'] ) {
+						if ( 'dry_run' === $mode ) {
 							esc_html_e( 'Dry Run Complete. No data was deleted.', 'cleanup-kit' );
 						} else {
 							esc_html_e( 'Cleanup Complete.', 'cleanup-kit' );
 						}
 						?>
-						<?php if ( isset( $_GET['log'] ) ) : ?>
-							<?php
-							// Fix: Unslash and sanitize log filename
-							$log_file = isset( $_GET['log'] ) ? basename( sanitize_text_field( wp_unslash( $_GET['log'] ) ) ) : '';
-							?>
+						<?php if ( ! empty( $log_file ) ) : ?>
 							<a href="<?php echo esc_url( content_url( 'uploads/cleanup-kit-logs/' . $log_file ) ); ?>" target="_blank" class="button button-small"><?php esc_html_e( 'View Log', 'cleanup-kit' ); ?></a>
 						<?php endif; ?>
 					</p>
 				</div>
-			<?php elseif ( isset( $_GET['message'] ) && 'no_selection' === $_GET['message'] ) : ?>
+			<?php elseif ( 'no_selection' === $message ) : ?>
 				<div class="notice notice-warning is-dismissible">
 					<p><?php esc_html_e( 'Please select at least one category.', 'cleanup-kit' ); ?></p>
 				</div>
@@ -268,8 +269,8 @@ class Cleanup_Kit_Admin {
 
 			<form method="get">
 				<input type="hidden" name="page" value="<?php echo esc_attr( self::ADMIN_SLUG ); ?>" />
-				<?php if ( isset( $_GET['paged'] ) ) : ?>
-					<input type="hidden" name="paged" value="<?php echo esc_attr( absint( $_GET['paged'] ) ); ?>" />
+				<?php if ( $paged_val > 1 ) : ?>
+					<input type="hidden" name="paged" value="<?php echo esc_attr( $paged_val ); ?>" />
 				<?php endif; ?>
 				<p class="search-box">
 					<label class="screen-reader-text" for="tag-search-input"><?php esc_html_e( 'Search Categories:', 'cleanup-kit' ); ?></label>
