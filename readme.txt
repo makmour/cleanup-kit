@@ -1,6 +1,6 @@
 === Cleanup Kit for WooCommerce ===
 Contributors: wprepublic, thewebcitizen
-Tags: woocommerce, cleanup, bulk delete, database, products, categories, wp-cli, developer, optimization, maintenance, orphaned data
+Tags: woocommerce, woocommerce cleanup, categories bulk delete, delete woocommerce categories
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
