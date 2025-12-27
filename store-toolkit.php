@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Store Toolkit for WooCommerce
- * Plugin URI:        https://wprepublic.com/
+* Plugin URI:        https://github.com/makmour/store-toolkit
  * Description:       A suite of professional tools for WooCommerce. Includes a cleanup utility to safely bulk delete products and orphaned data.
  * Version:           1.1.0
  * Author:            WP Republic
