@@ -5,16 +5,16 @@ if ( ! defined( 'ABSPATH' ) || ! ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 }
 
 /**
- * Implements WP-CLI commands for Cleanup Kit.
+ * Implements WP-CLI commands for Store Toolkit.
  */
-class Cleanup_Kit_CLI extends WP_CLI_Command {
+class Store_Toolkit_CLI extends WP_CLI_Command {
 
 	/**
 	 * Lists all product categories with their product counts.
 	 *
 	 * ## EXAMPLES
 	 *
-	 * wp cleanup-kit list-categories
+	 * wp store-toolkit list-categories
 	 *
 	 */
 	public function list_categories( $_, $assoc_args ) {
@@ -62,10 +62,10 @@ class Cleanup_Kit_CLI extends WP_CLI_Command {
 	 * ## EXAMPLES
 	 *
 	 * # Perform a dry run on the 'old-imports' category
-	 * wp cleanup-kit run --category-slug=old-imports --dry-run
+	 * wp store-toolkit run --category-slug=old-imports --dry-run
 	 *
 	 * # Perform a live cleanup on categories with IDs 123 and 456
-	 * wp cleanup-kit run --term-id=123,456
+	 * wp store-toolkit run --term-id=123,456
 	 *
 	 * @when after_wp_load
 	 */
@@ -109,7 +109,7 @@ class Cleanup_Kit_CLI extends WP_CLI_Command {
 			WP_CLI::confirm( 'You are about to permanently delete products from the selected categories. This action cannot be undone. Are you sure you want to proceed?' );
 		}
 
-		$core     = new Cleanup_Kit_Core();
+		$core     = new Store_Toolkit_Core();
 		$log_path = $core->run_cleanup( $final_term_ids, $is_dry_run );
 
 		WP_CLI::line( "\n" . file_get_contents( $log_path ) );

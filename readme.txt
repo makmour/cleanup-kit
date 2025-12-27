@@ -1,98 +1,99 @@
-=== Cleanup Kit for WooCommerce ===
+=== Store Toolkit for WooCommerce ===
 Contributors: wprepublic, thewebcitizen
 Donate link: https://wprepublic.com
-Tags: woocommerce, woocommerce cleanup, categories bulk delete, delete woocommerce categories
+Tags: woocommerce, woocommerce cleanup, categories bulk delete, store maintenance, woocommerce tools
 Requires at least: 5.8
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.6
+Stable tag: 1.1.0
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Safely bulk delete WooCommerce products by category and purge orphaned data.
-Features WP-CLI and Dry Run protection.
+Professional tools to manage, clean, and optimize your WooCommerce store. Includes a powerful Cleanup Module.
 
 == Description ==
 
-**Is your WooCommerce database bloated with old products or failed imports?**
+**Managing a growing WooCommerce store requires the right tools.**
 
-Managing a large store can be a nightmare when you need to delete thousands of products.
-Standard deletion often times out or leaves behind "orphaned data"—useless rows in your database that slow down your site.
-**Cleanup Kit for WooCommerce** is a professional-grade utility designed to solve this with surgical precision.
-It allows you to bulk delete products by category while automatically identifying and removing the leftover data that WooCommerce leaves behind.
-### Why use Cleanup Kit?
+**Store Toolkit for WooCommerce** is designed to be your Swiss Army knife for store operations.
+The first available module is the **Cleanup Utility**, designed to solve the problem of bloated databases caused by old products or failed imports.
 
-* **Deep Cleaning:** Unlike standard deletion, this tool removes associated relationships, `postmeta`, and `wc_product_meta_lookup` entries to keep your database lean.
-* **Safety First:** Includes a **Dry Run** mode (enabled by default) so you can simulate the cleanup and view a detailed log before deleting a single file.
-* **Developer Friendly:** Full **WP-CLI** integration allows you to script cleanups for massive stores via command line.
-### Key Features
+### Module 1: Cleanup Utility
+
+When you need to delete thousands of products, standard deletion often times out or leaves behind "orphaned data".
+The Cleanup Utility allows you to:
 
 * **Bulk Delete by Category:** Select specific categories to wipe all contained products (the categories themselves are preserved).
-* **Orphaned Data Removal:** Automatically cleans up metadata and lookup table entries.
-* **Detailed Logging:** Generates audit logs in `/wp-content/uploads/cleanup-kit-logs/` for every action.
-* **WP-CLI Commands:** Use `wp cleanup-kit run` for server-side execution.
-* **Visual Admin Interface:** Simple, easy-to-use dashboard inside WooCommerce settings.
-> **WARNING:** This is a destructive tool. Always perform a full database backup before use.
+* **Deep Clean:** Removes associated relationships, `postmeta`, and `wc_product_meta_lookup` entries.
+* **Dry Run Mode:** Simulate the cleanup and view a detailed log before deleting a single file.
+* **WP-CLI Support:** Script cleanups for massive stores via command line.
+
+*(More modules coming soon)*
+
 == Installation ==
 
 **From your WordPress dashboard:**
 
 1.  Navigate to 'Plugins > Add New'.
-2.  Search for 'Cleanup Kit for WooCommerce'.
+2.  Search for 'Store Toolkit for WooCommerce'.
 3.  Click 'Install Now'.
-4.  Activate the plugin through the 'Plugins' menu in WordPress.
-5.  Navigate to 'WooCommerce > Cleanup Kit' to get started.
-**Manual Installation:**
+4.  Activate the plugin.
+5.  Navigate to 'WooCommerce > Store Toolkit' to get started.
 
-1.  Upload the `cleanup-kit` folder to the `/wp-content/plugins/` directory.
-2.  Activate the plugin through the 'Plugins' menu in WordPress.
-3.  Navigate to 'WooCommerce > Cleanup Kit' to get started.
+== WP-CLI Commands ==
+
+This plugin provides robust WP-CLI commands for server-side management.
+
+### 1. List Categories
+View a table of all product categories.
+
+`wp store-toolkit list-categories`
+
+### 2. Run Cleanup
+Execute the cleanup process for specific categories.
+
+**Options:**
+
+* `--term-id=<ids>` : A comma-separated list of category IDs.
+* `--category-slug=<slugs>` : A comma-separated list of category slugs.
+* `--dry-run` : (Optional) Simulate the cleanup.
+
+**Examples:**
+
+**Dry Run:**
+`wp store-toolkit run --category-slug=clothing --dry-run`
+
+**Live Cleanup:**
+`wp store-toolkit run --term-id=12,45`
+
 == Frequently Asked Questions ==
 
 = Is this tool safe to use? =
 
-Yes, when used correctly.
-The plugin includes a **Dry Run** mode, which is enabled by default.
-This mode simulates the entire cleanup process and generates a detailed log of what *would* be deleted, without touching your database.
-We strongly recommend you perform a dry run and review the log before running a live cleanup.
-**Always back up your database first.**
+Yes. The **Dry Run** mode (enabled by default) allows you to simulate the process safely. Always back up your database before running a live cleanup.
 
 = Does it delete the categories too? =
 
-No. The plugin deletes all products *within* the selected categories, but the category terms themselves remain on your site (they will just be empty).
+No. The plugin deletes all products *within* the selected categories, but the category terms themselves remain.
 
-= What data does it actually clean? =
+= Where are the log files stored? =
 
-It performs a deep clean.
-For each product, it deletes:
-* The product post itself (and variations).
-* All associated post metadata (`postmeta` table).
-* All term relationships (e.g., tags, attributes).
-* Entries in the `wc_product_meta_lookup` table.
-= Can I use this for posts or other post types?
-=
+Logs are stored in: `/wp-content/uploads/store-toolkit-logs/`.
 
-No. This plugin is built specifically for WooCommerce products and `product_cat` taxonomies.
-
-= Where are the log files stored?
-=
-
-All logs are stored in your WordPress uploads directory, inside a folder named `cleanup-kit-logs`. The full path is: `/wp-content/uploads/cleanup-kit-logs/`.
 == Screenshots ==
 
 1. **Admin Dashboard:** The main interface allowing you to select categories and choose between Dry Run or Live Cleanup.
 2. **Cleanup Log:** An example of the detailed log file generated after a cleanup process.
+
 == Changelog ==
+
+= 1.1.0 =
+* REBRAND: Renamed plugin to **Store Toolkit for WooCommerce**.
+* FEATURE: Prepared architecture for future add-on modules.
+* UPDATE: Updated WP-CLI commands to `wp store-toolkit`.
 
 = 1.0.6 =
 * FEATURE: Added Search, Sort, and Pagination to the admin table.
-* FIX: Resolved issue where unchecking screen options did not save correctly.
-= 1.0.5 =
-* FIX: Added `WC Blocks: true` declaration to the main plugin header to provide full compatibility with modern WooCommerce features.
+
 = 1.0.0 =
 * Initial release.
-
-== Upgrade Notice ==
-
-= 1.0.6 =
-This version introduces a new search and pagination feature for better category management.

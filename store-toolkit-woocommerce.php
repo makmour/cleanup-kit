@@ -1,14 +1,14 @@
 <?php
 /**
- * Plugin Name:       Cleanup Kit for WooCommerce
+ * Plugin Name:       Store Toolkit for WooCommerce
  * Plugin URI:        https://wprepublic.com/
- * Description:       Safely bulk delete products by category and remove orphaned data. Features WP-CLI support and Dry Run mode.
- * Version:           1.0.6
+ * Description:       A suite of professional tools for WooCommerce. Includes a cleanup utility to safely bulk delete products and orphaned data.
+ * Version:           1.1.0
  * Author:            WP Republic
  * Author URI:        https://wprepublic.com/
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       cleanup-kit
+ * Text Domain:       store-toolkit-woocommerce
  * Domain Path:       /languages
  * Requires at least: 5.8
  * Tested up to: 6.9
@@ -22,18 +22,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'CLEANUP_KIT_VERSION', '1.0.6' );
-define( 'CLEANUP_KIT_PATH', plugin_dir_path( __FILE__ ) );
-define( 'CLEANUP_KIT_URL', plugin_dir_url( __FILE__ ) );
+define( 'STORE_TOOLKIT_VERSION', '1.1.0' );
+define( 'STORE_TOOLKIT_PATH', plugin_dir_path( __FILE__ ) );
+define( 'STORE_TOOLKIT_URL', plugin_dir_url( __FILE__ ) );
 
 /**
  * The main plugin class.
  */
-final class Cleanup_Kit {
+final class Store_Toolkit {
 
 	/**
 	 * The single instance of the class.
-	 * @var Cleanup_Kit
+	 * @var Store_Toolkit
 	 */
 	private static $_instance = null;
 
@@ -69,11 +69,11 @@ final class Cleanup_Kit {
 
 		// Instantiate classes.
 		if ( $this->is_request( 'admin' ) ) {
-			new Cleanup_Kit_Admin();
+			new Store_Toolkit_Admin();
 		}
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			WP_CLI::add_command( 'cleanup-kit', 'Cleanup_Kit_CLI' );
+			WP_CLI::add_command( 'store-toolkit', 'Store_Toolkit_CLI' );
 		}
 	}
 
@@ -81,10 +81,10 @@ final class Cleanup_Kit {
 	 * Include required files.
 	 */
 	private function includes() {
-		require_once CLEANUP_KIT_PATH . 'includes/class-cleanup-kit-core.php';
-		require_once CLEANUP_KIT_PATH . 'includes/class-cleanup-kit-admin.php';
+		require_once STORE_TOOLKIT_PATH . 'includes/class-store-toolkit-core.php';
+		require_once STORE_TOOLKIT_PATH . 'includes/class-store-toolkit-admin.php';
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
-			require_once CLEANUP_KIT_PATH . 'includes/class-cleanup-kit-cli.php';
+			require_once STORE_TOOLKIT_PATH . 'includes/class-store-toolkit-cli.php';
 		}
 	}
 
@@ -113,8 +113,8 @@ final class Cleanup_Kit {
 		?>
 		<div class="notice notice-error is-dismissible">
 			<p>
-				<strong><?php esc_html_e( 'Cleanup Kit', 'cleanup-kit' ); ?></strong>
-				<?php esc_html_e( 'requires WooCommerce to be installed and activated.', 'cleanup-kit' ); ?>
+				<strong><?php esc_html_e( 'Store Toolkit for WooCommerce', 'store-toolkit-woocommerce' ); ?></strong>
+				<?php esc_html_e( 'requires WooCommerce to be installed and activated.', 'store-toolkit-woocommerce' ); ?>
 			</p>
 		</div>
 		<?php
@@ -124,9 +124,9 @@ final class Cleanup_Kit {
 /**
  * Begins execution of the plugin.
  */
-function cleanup_kit() {
-	return Cleanup_Kit::instance();
+function store_toolkit() {
+	return Store_Toolkit::instance();
 }
 
 // Let's go!
-cleanup_kit();
+store_toolkit();

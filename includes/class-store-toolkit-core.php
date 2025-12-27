@@ -5,23 +5,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Core cleanup functionality.
+ * Core functionality for Store Toolkit.
  */
-class Cleanup_Kit_Core {
+class Store_Toolkit_Core {
 
 	private $log_file_path;
 	private $log_dir;
 
 	public function __construct() {
 		$upload_dir    = wp_upload_dir();
-		$this->log_dir = trailingslashit( $upload_dir['basedir'] ) . 'cleanup-kit-logs';
+		// Updated log directory name
+		$this->log_dir = trailingslashit( $upload_dir['basedir'] ) . 'store-toolkit-logs';
 
 		// Create the directory if it doesn't exist.
 		if ( ! file_exists( $this->log_dir ) ) {
 			wp_mkdir_p( $this->log_dir );
 		}
 
-		// SECURITY: Prevent directory listing by ensuring an index.php file exists.
+		// SECURITY: Prevent directory listing.
 		if ( ! file_exists( trailingslashit( $this->log_dir ) . 'index.php' ) ) {
 			file_put_contents( trailingslashit( $this->log_dir ) . 'index.php', '<?php // Silence is golden.' );
 		}
@@ -45,8 +46,6 @@ class Cleanup_Kit_Core {
 				'posts_per_page' => -1,
 				'fields'         => 'ids',
 				'post_status'    => 'any',
-				// WPCS: The SlowDBQuery sniff flags tax_query. We are using 'fields' => 'ids'
-				// which is the recommended way to handle this for performance. This is a deliberate choice.
 				'tax_query'      => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 					[
 						'taxonomy' => 'product_cat',
@@ -73,7 +72,7 @@ class Cleanup_Kit_Core {
 				continue;
 			}
 
-			// HARDENING: Sanitize product data before logging to prevent injection.
+			// HARDENING: Sanitize product data before logging.
 			$safe_name = sanitize_text_field( $product->get_name() );
 			$safe_sku  = sanitize_text_field( $product->get_sku() );
 			$this->log( "Processing Product ID: {$product_id} | SKU: {$safe_sku} | Name: {$safe_name}" );
@@ -122,7 +121,8 @@ class Cleanup_Kit_Core {
 
 	private function start_log( $is_dry_run ) {
 		$mode                  = $is_dry_run ? 'DRY_RUN' : 'LIVE';
-		$filename              = "cleanup-{$mode}-" . gmdate( 'Y-m-d-His' ) . '.log';
+		// Renamed log prefix
+		$filename              = "store-toolkit-cleanup-{$mode}-" . gmdate( 'Y-m-d-His' ) . '.log';
 		$this->log_file_path   = trailingslashit( $this->log_dir ) . $filename;
 		file_put_contents( $this->log_file_path, '' );
 	}

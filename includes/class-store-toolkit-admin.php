@@ -5,15 +5,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Admin UI for the Cleanup Kit plugin.
+ * Admin UI for Store Toolkit.
  */
-class Cleanup_Kit_Admin {
+class Store_Toolkit_Admin {
 
-	const ADMIN_SLUG = 'cleanup-kit';
-	const NONCE_ACTION = 'cleanup_kit_run_nonce';
-	const FORM_ACTION = 'cleanup_kit_run_form';
-	const OPTION_KEY_COLUMNS = 'cleanup_kit_columns';
-	const OPTION_KEY_PER_PAGE = 'cleanup_kit_per_page';
+	const ADMIN_SLUG = 'store-toolkit';
+	const NONCE_ACTION = 'store_toolkit_run_nonce';
+	const FORM_ACTION = 'store_toolkit_run_form';
+	const OPTION_KEY_COLUMNS = 'store_toolkit_columns';
+	const OPTION_KEY_PER_PAGE = 'store_toolkit_per_page';
 
 	private $screen_hook_suffix = null;
 
@@ -21,15 +21,14 @@ class Cleanup_Kit_Admin {
 		add_action( 'admin_menu', [ $this, 'add_admin_page' ] );
 		add_action( 'admin_post_' . self::FORM_ACTION, [ $this, 'handle_form_submission' ] );
 		
-		// Hook into admin_init to reliably save custom checkboxes.
 		add_action( 'admin_init', [ $this, 'save_custom_screen_options' ] );
 	}
 
 	public function add_admin_page() {
 		$this->screen_hook_suffix = add_submenu_page(
 			'woocommerce',
-			__( 'Cleanup Kit', 'cleanup-kit' ),
-			__( 'Cleanup Kit', 'cleanup-kit' ),
+			__( 'Store Toolkit', 'store-toolkit-woocommerce' ),
+			__( 'Store Toolkit', 'store-toolkit-woocommerce' ),
 			'manage_woocommerce',
 			self::ADMIN_SLUG,
 			[ $this, 'render_page' ]
@@ -42,7 +41,7 @@ class Cleanup_Kit_Admin {
 		add_screen_option(
 			'per_page',
 			[
-				'label'   => __( 'Number of items per page:', 'cleanup-kit' ),
+				'label'   => __( 'Number of items per page:', 'store-toolkit-woocommerce' ),
 				'default' => 20,
 				'option'  => self::OPTION_KEY_PER_PAGE,
 			]
@@ -105,13 +104,13 @@ class Cleanup_Kit_Admin {
 		$columns = wp_parse_args( $columns, $defaults );
 
 		$html = '<fieldset class="metabox-prefs">';
-		$html .= '<legend>' . esc_html__( 'Columns', 'cleanup-kit' ) . '</legend>';
+		$html .= '<legend>' . esc_html__( 'Columns', 'store-toolkit-woocommerce' ) . '</legend>';
 		$html .= '<div class="metabox-prefs-container">';
 		
-		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[image]" value="1" ' . checked( $columns['image'], 1, false ) . ' /> ' . esc_html__( 'Image', 'cleanup-kit' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[description]" value="1" ' . checked( $columns['description'], 1, false ) . ' /> ' . esc_html__( 'Description', 'cleanup-kit' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[slug]" value="1" ' . checked( $columns['slug'], 1, false ) . ' /> ' . esc_html__( 'Slug', 'cleanup-kit' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[count]" value="1" ' . checked( $columns['count'], 1, false ) . ' /> ' . esc_html__( 'Count', 'cleanup-kit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[image]" value="1" ' . checked( $columns['image'], 1, false ) . ' /> ' . esc_html__( 'Image', 'store-toolkit-woocommerce' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[description]" value="1" ' . checked( $columns['description'], 1, false ) . ' /> ' . esc_html__( 'Description', 'store-toolkit-woocommerce' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[slug]" value="1" ' . checked( $columns['slug'], 1, false ) . ' /> ' . esc_html__( 'Slug', 'store-toolkit-woocommerce' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[count]" value="1" ' . checked( $columns['count'], 1, false ) . ' /> ' . esc_html__( 'Count', 'store-toolkit-woocommerce' ) . '</label>';
 		
 		$html .= '</div></fieldset><br class="clear">';
 
@@ -122,7 +121,7 @@ class Cleanup_Kit_Admin {
 		check_admin_referer( self::NONCE_ACTION );
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'cleanup-kit' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'store-toolkit-woocommerce' ) );
 		}
 
 		$term_ids = isset( $_POST['term_ids'] ) ? array_map( 'intval', $_POST['term_ids'] ) : [];
@@ -134,7 +133,7 @@ class Cleanup_Kit_Admin {
 
 		$is_dry_run = isset( $_POST['dry_run'] ) && '1' === $_POST['dry_run'];
 		
-		$core     = new Cleanup_Kit_Core();
+		$core     = new Store_Toolkit_Core();
 		$log_path = $core->run_cleanup( $term_ids, $is_dry_run );
 
 		$query_args = [
@@ -183,8 +182,6 @@ class Cleanup_Kit_Admin {
 			$per_page = 20;
 		}
 
-		// Security: Unslash GET variables before sanitization.
-		// We disable NonceVerification because these variables are used for display logic (search, sort, messages), not data modification.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$search    = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 		$orderby   = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'name';
@@ -232,7 +229,6 @@ class Cleanup_Kit_Admin {
 
 		$total_pages = ceil( $total_terms / $per_page );
 		
-		// Setup pagination arguments for paginate_links
 		$pagination_args = [
 			'base'    => add_query_arg( 'paged', '%#%' ),
 			'format'  => '',
@@ -242,28 +238,33 @@ class Cleanup_Kit_Admin {
 
 		?>
 		<div class="wrap woocommerce">
-			<h1 class="wp-heading-inline"><?php esc_html_e( 'Cleanup Kit for WooCommerce', 'cleanup-kit' ); ?></h1>
-			<p><?php esc_html_e( 'Select categories to permanently delete products and clean up orphaned data.', 'cleanup-kit' ); ?></p>
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Store Toolkit for WooCommerce', 'store-toolkit-woocommerce' ); ?></h1>
+			<p><?php esc_html_e( 'Tools to manage, clean, and optimize your store.', 'store-toolkit-woocommerce' ); ?></p>
 			<hr class="wp-header-end">
+			
+			<h2 class="nav-tab-wrapper">
+				<a href="#" class="nav-tab nav-tab-active"><?php esc_html_e( 'Cleanup Tool', 'store-toolkit-woocommerce' ); ?></a>
+			</h2>
+			<br>
 
 			<?php if ( 'success' === $message ) : ?>
 				<div class="notice notice-success is-dismissible">
 					<p>
 						<?php 
 						if ( 'dry_run' === $mode ) {
-							esc_html_e( 'Dry Run Complete. No data was deleted.', 'cleanup-kit' );
+							esc_html_e( 'Dry Run Complete. No data was deleted.', 'store-toolkit-woocommerce' );
 						} else {
-							esc_html_e( 'Cleanup Complete.', 'cleanup-kit' );
+							esc_html_e( 'Cleanup Complete.', 'store-toolkit-woocommerce' );
 						}
 						?>
 						<?php if ( ! empty( $log_file ) ) : ?>
-							<a href="<?php echo esc_url( content_url( 'uploads/cleanup-kit-logs/' . $log_file ) ); ?>" target="_blank" class="button button-small"><?php esc_html_e( 'View Log', 'cleanup-kit' ); ?></a>
+							<a href="<?php echo esc_url( content_url( 'uploads/store-toolkit-logs/' . $log_file ) ); ?>" target="_blank" class="button button-small"><?php esc_html_e( 'View Log', 'store-toolkit-woocommerce' ); ?></a>
 						<?php endif; ?>
 					</p>
 				</div>
 			<?php elseif ( 'no_selection' === $message ) : ?>
 				<div class="notice notice-warning is-dismissible">
-					<p><?php esc_html_e( 'Please select at least one category.', 'cleanup-kit' ); ?></p>
+					<p><?php esc_html_e( 'Please select at least one category.', 'store-toolkit-woocommerce' ); ?></p>
 				</div>
 			<?php endif; ?>
 
@@ -273,9 +274,9 @@ class Cleanup_Kit_Admin {
 					<input type="hidden" name="paged" value="<?php echo esc_attr( $paged_val ); ?>" />
 				<?php endif; ?>
 				<p class="search-box">
-					<label class="screen-reader-text" for="tag-search-input"><?php esc_html_e( 'Search Categories:', 'cleanup-kit' ); ?></label>
+					<label class="screen-reader-text" for="tag-search-input"><?php esc_html_e( 'Search Categories:', 'store-toolkit-woocommerce' ); ?></label>
 					<input type="search" id="tag-search-input" name="s" value="<?php echo esc_attr( $search ); ?>">
-					<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Categories', 'cleanup-kit' ); ?>">
+					<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Categories', 'store-toolkit-woocommerce' ); ?>">
 				</p>
 			</form>
 
@@ -286,17 +287,17 @@ class Cleanup_Kit_Admin {
 				<div class="tablenav top">
 					<div class="alignleft actions bulkactions">
 						<select name="dry_run">
-							<option value="1"><?php esc_html_e( 'Dry Run (Simulation)', 'cleanup-kit' ); ?></option>
-							<option value="0"><?php esc_html_e( 'Live Cleanup (Delete Data)', 'cleanup-kit' ); ?></option>
+							<option value="1"><?php esc_html_e( 'Dry Run (Simulation)', 'store-toolkit-woocommerce' ); ?></option>
+							<option value="0"><?php esc_html_e( 'Live Cleanup (Delete Data)', 'store-toolkit-woocommerce' ); ?></option>
 						</select>
-						<input type="submit" class="button action" value="<?php esc_attr_e( 'Run', 'cleanup-kit' ); ?>">
+						<input type="submit" class="button action" value="<?php esc_attr_e( 'Run Cleanup', 'store-toolkit-woocommerce' ); ?>">
 					</div>
 					<div class="tablenav-pages">
 						<span class="displaying-num">
 							<?php
 							printf(
 								/* translators: %s: Number of items */
-								esc_html( _n( '%s item', '%s items', $total_terms, 'cleanup-kit' ) ),
+								esc_html( _n( '%s item', '%s items', $total_terms, 'store-toolkit-woocommerce' ) ),
 								esc_html( number_format_i18n( $total_terms ) )
 							);
 							?>
@@ -314,28 +315,28 @@ class Cleanup_Kit_Admin {
 							<td id="cb" class="manage-column column-cb check-column"><input type="checkbox" /></td>
 							
 							<?php if ( ! empty( $columns['image'] ) ) : ?>
-								<th scope="col" class="manage-column column-thumb"><span class="wc-image tips"><?php esc_html_e( 'Image', 'cleanup-kit' ); ?></span></th>
+								<th scope="col" class="manage-column column-thumb"><span class="wc-image tips"><?php esc_html_e( 'Image', 'store-toolkit-woocommerce' ); ?></span></th>
 							<?php endif; ?>
 
 							<th scope="col" class="manage-column column-name column-primary sortable <?php echo ( 'name' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-								<?php $this->print_column_header( 'name', __( 'Name', 'cleanup-kit' ), $orderby, $order ); ?>
+								<?php $this->print_column_header( 'name', __( 'Name', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
 							</th>
 
 							<?php if ( ! empty( $columns['description'] ) ) : ?>
 								<th scope="col" class="manage-column column-description sortable <?php echo ( 'description' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'description', __( 'Description', 'cleanup-kit' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'description', __( 'Description', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['slug'] ) ) : ?>
 								<th scope="col" class="manage-column column-slug sortable <?php echo ( 'slug' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'slug', __( 'Slug', 'cleanup-kit' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'slug', __( 'Slug', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['count'] ) ) : ?>
 								<th scope="col" class="manage-column column-posts num sortable <?php echo ( 'count' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'count', __( 'Count', 'cleanup-kit' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'count', __( 'Count', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 						</tr>
@@ -358,10 +359,10 @@ class Cleanup_Kit_Admin {
 										<td class="thumb column-thumb"><?php echo wp_kses_post( $image ); ?></td>
 									<?php endif; ?>
 
-									<td class="name column-name" data-colname="<?php esc_attr_e( 'Name', 'cleanup-kit' ); ?>">
+									<td class="name column-name" data-colname="<?php esc_attr_e( 'Name', 'store-toolkit-woocommerce' ); ?>">
 										<strong><a href="<?php echo esc_url( get_term_link( $category ) ); ?>" target="_blank" class="row-title"><?php echo esc_html( $category->name ); ?></a></strong>
 										<div class="row-actions">
-											<span class="view"><a href="<?php echo esc_url( get_term_link( $category ) ); ?>" target="_blank"><?php esc_html_e( 'View', 'cleanup-kit' ); ?></a></span>
+											<span class="view"><a href="<?php echo esc_url( get_term_link( $category ) ); ?>" target="_blank"><?php esc_html_e( 'View', 'store-toolkit-woocommerce' ); ?></a></span>
 											<span class="id">ID: <?php echo esc_html( $category->term_id ); ?></span>
 										</div>
 									</td>
@@ -383,7 +384,7 @@ class Cleanup_Kit_Admin {
 						} else {
 							?>
 							<tr>
-								<td colspan="6"><?php esc_html_e( 'No categories found.', 'cleanup-kit' ); ?></td>
+								<td colspan="6"><?php esc_html_e( 'No categories found.', 'store-toolkit-woocommerce' ); ?></td>
 							</tr>
 							<?php
 						}
@@ -394,28 +395,28 @@ class Cleanup_Kit_Admin {
 							<td class="manage-column column-cb check-column"><input type="checkbox" /></td>
 							
 							<?php if ( ! empty( $columns['image'] ) ) : ?>
-								<th scope="col" class="manage-column column-thumb"><?php esc_html_e( 'Image', 'cleanup-kit' ); ?></th>
+								<th scope="col" class="manage-column column-thumb"><?php esc_html_e( 'Image', 'store-toolkit-woocommerce' ); ?></th>
 							<?php endif; ?>
 
 							<th scope="col" class="manage-column column-name column-primary sortable <?php echo ( 'name' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-								<?php $this->print_column_header( 'name', __( 'Name', 'cleanup-kit' ), $orderby, $order ); ?>
+								<?php $this->print_column_header( 'name', __( 'Name', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
 							</th>
 
 							<?php if ( ! empty( $columns['description'] ) ) : ?>
 								<th scope="col" class="manage-column column-description sortable <?php echo ( 'description' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'description', __( 'Description', 'cleanup-kit' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'description', __( 'Description', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['slug'] ) ) : ?>
 								<th scope="col" class="manage-column column-slug sortable <?php echo ( 'slug' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'slug', __( 'Slug', 'cleanup-kit' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'slug', __( 'Slug', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['count'] ) ) : ?>
 								<th scope="col" class="manage-column column-posts num sortable <?php echo ( 'count' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'count', __( 'Count', 'cleanup-kit' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'count', __( 'Count', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 						</tr>
@@ -428,7 +429,7 @@ class Cleanup_Kit_Admin {
 							<?php
 							printf(
 								/* translators: %s: Number of items */
-								esc_html( _n( '%s item', '%s items', $total_terms, 'cleanup-kit' ) ),
+								esc_html( _n( '%s item', '%s items', $total_terms, 'store-toolkit-woocommerce' ) ),
 								esc_html( number_format_i18n( $total_terms ) )
 							);
 							?>
