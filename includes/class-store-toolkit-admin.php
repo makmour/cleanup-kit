@@ -27,8 +27,8 @@ class Store_Toolkit_Admin {
 	public function add_admin_page() {
 		$this->screen_hook_suffix = add_submenu_page(
 			'woocommerce',
-			__( 'Store Toolkit', 'store-toolkit-woocommerce' ),
-			__( 'Store Toolkit', 'store-toolkit-woocommerce' ),
+			__( 'Store Toolkit', 'store-toolkit' ),
+			__( 'Store Toolkit', 'store-toolkit' ),
 			'manage_woocommerce',
 			self::ADMIN_SLUG,
 			[ $this, 'render_page' ]
@@ -41,7 +41,7 @@ class Store_Toolkit_Admin {
 		add_screen_option(
 			'per_page',
 			[
-				'label'   => __( 'Number of items per page:', 'store-toolkit-woocommerce' ),
+				'label'   => __( 'Number of items per page:', 'store-toolkit' ),
 				'default' => 20,
 				'option'  => self::OPTION_KEY_PER_PAGE,
 			]
@@ -104,13 +104,13 @@ class Store_Toolkit_Admin {
 		$columns = wp_parse_args( $columns, $defaults );
 
 		$html = '<fieldset class="metabox-prefs">';
-		$html .= '<legend>' . esc_html__( 'Columns', 'store-toolkit-woocommerce' ) . '</legend>';
+		$html .= '<legend>' . esc_html__( 'Columns', 'store-toolkit' ) . '</legend>';
 		$html .= '<div class="metabox-prefs-container">';
 		
-		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[image]" value="1" ' . checked( $columns['image'], 1, false ) . ' /> ' . esc_html__( 'Image', 'store-toolkit-woocommerce' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[description]" value="1" ' . checked( $columns['description'], 1, false ) . ' /> ' . esc_html__( 'Description', 'store-toolkit-woocommerce' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[slug]" value="1" ' . checked( $columns['slug'], 1, false ) . ' /> ' . esc_html__( 'Slug', 'store-toolkit-woocommerce' ) . '</label>';
-		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[count]" value="1" ' . checked( $columns['count'], 1, false ) . ' /> ' . esc_html__( 'Count', 'store-toolkit-woocommerce' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[image]" value="1" ' . checked( $columns['image'], 1, false ) . ' /> ' . esc_html__( 'Image', 'store-toolkit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[description]" value="1" ' . checked( $columns['description'], 1, false ) . ' /> ' . esc_html__( 'Description', 'store-toolkit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[slug]" value="1" ' . checked( $columns['slug'], 1, false ) . ' /> ' . esc_html__( 'Slug', 'store-toolkit' ) . '</label>';
+		$html .= '<label><input type="checkbox" name="' . esc_attr( self::OPTION_KEY_COLUMNS ) . '[count]" value="1" ' . checked( $columns['count'], 1, false ) . ' /> ' . esc_html__( 'Count', 'store-toolkit' ) . '</label>';
 		
 		$html .= '</div></fieldset><br class="clear">';
 
@@ -121,7 +121,7 @@ class Store_Toolkit_Admin {
 		check_admin_referer( self::NONCE_ACTION );
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'store-toolkit-woocommerce' ) );
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'store-toolkit' ) );
 		}
 
 		$term_ids = isset( $_POST['term_ids'] ) ? array_map( 'intval', $_POST['term_ids'] ) : [];
@@ -238,12 +238,12 @@ class Store_Toolkit_Admin {
 
 		?>
 		<div class="wrap woocommerce">
-			<h1 class="wp-heading-inline"><?php esc_html_e( 'Store Toolkit for WooCommerce', 'store-toolkit-woocommerce' ); ?></h1>
-			<p><?php esc_html_e( 'Tools to manage, clean, and optimize your store.', 'store-toolkit-woocommerce' ); ?></p>
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Store Toolkit for WooCommerce', 'store-toolkit' ); ?></h1>
+			<p><?php esc_html_e( 'Tools to manage, clean, and optimize your store.', 'store-toolkit' ); ?></p>
 			<hr class="wp-header-end">
 			
 			<h2 class="nav-tab-wrapper">
-				<a href="#" class="nav-tab nav-tab-active"><?php esc_html_e( 'Cleanup Tool', 'store-toolkit-woocommerce' ); ?></a>
+				<a href="#" class="nav-tab nav-tab-active"><?php esc_html_e( 'Cleanup Tool', 'store-toolkit' ); ?></a>
 			</h2>
 			<br>
 
@@ -252,19 +252,19 @@ class Store_Toolkit_Admin {
 					<p>
 						<?php 
 						if ( 'dry_run' === $mode ) {
-							esc_html_e( 'Dry Run Complete. No data was deleted.', 'store-toolkit-woocommerce' );
+							esc_html_e( 'Dry Run Complete. No data was deleted.', 'store-toolkit' );
 						} else {
-							esc_html_e( 'Cleanup Complete.', 'store-toolkit-woocommerce' );
+							esc_html_e( 'Cleanup Complete.', 'store-toolkit' );
 						}
 						?>
 						<?php if ( ! empty( $log_file ) ) : ?>
-							<a href="<?php echo esc_url( content_url( 'uploads/store-toolkit-logs/' . $log_file ) ); ?>" target="_blank" class="button button-small"><?php esc_html_e( 'View Log', 'store-toolkit-woocommerce' ); ?></a>
+							<a href="<?php echo esc_url( content_url( 'uploads/store-toolkit-logs/' . $log_file ) ); ?>" target="_blank" class="button button-small"><?php esc_html_e( 'View Log', 'store-toolkit' ); ?></a>
 						<?php endif; ?>
 					</p>
 				</div>
 			<?php elseif ( 'no_selection' === $message ) : ?>
 				<div class="notice notice-warning is-dismissible">
-					<p><?php esc_html_e( 'Please select at least one category.', 'store-toolkit-woocommerce' ); ?></p>
+					<p><?php esc_html_e( 'Please select at least one category.', 'store-toolkit' ); ?></p>
 				</div>
 			<?php endif; ?>
 
@@ -274,9 +274,9 @@ class Store_Toolkit_Admin {
 					<input type="hidden" name="paged" value="<?php echo esc_attr( $paged_val ); ?>" />
 				<?php endif; ?>
 				<p class="search-box">
-					<label class="screen-reader-text" for="tag-search-input"><?php esc_html_e( 'Search Categories:', 'store-toolkit-woocommerce' ); ?></label>
+					<label class="screen-reader-text" for="tag-search-input"><?php esc_html_e( 'Search Categories:', 'store-toolkit' ); ?></label>
 					<input type="search" id="tag-search-input" name="s" value="<?php echo esc_attr( $search ); ?>">
-					<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Categories', 'store-toolkit-woocommerce' ); ?>">
+					<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Categories', 'store-toolkit' ); ?>">
 				</p>
 			</form>
 
@@ -287,17 +287,17 @@ class Store_Toolkit_Admin {
 				<div class="tablenav top">
 					<div class="alignleft actions bulkactions">
 						<select name="dry_run">
-							<option value="1"><?php esc_html_e( 'Dry Run (Simulation)', 'store-toolkit-woocommerce' ); ?></option>
-							<option value="0"><?php esc_html_e( 'Live Cleanup (Delete Data)', 'store-toolkit-woocommerce' ); ?></option>
+							<option value="1"><?php esc_html_e( 'Dry Run (Simulation)', 'store-toolkit' ); ?></option>
+							<option value="0"><?php esc_html_e( 'Live Cleanup (Delete Data)', 'store-toolkit' ); ?></option>
 						</select>
-						<input type="submit" class="button action" value="<?php esc_attr_e( 'Run Cleanup', 'store-toolkit-woocommerce' ); ?>">
+						<input type="submit" class="button action" value="<?php esc_attr_e( 'Run Cleanup', 'store-toolkit' ); ?>">
 					</div>
 					<div class="tablenav-pages">
 						<span class="displaying-num">
 							<?php
 							printf(
 								/* translators: %s: Number of items */
-								esc_html( _n( '%s item', '%s items', $total_terms, 'store-toolkit-woocommerce' ) ),
+								esc_html( _n( '%s item', '%s items', $total_terms, 'store-toolkit' ) ),
 								esc_html( number_format_i18n( $total_terms ) )
 							);
 							?>
@@ -315,28 +315,28 @@ class Store_Toolkit_Admin {
 							<td id="cb" class="manage-column column-cb check-column"><input type="checkbox" /></td>
 							
 							<?php if ( ! empty( $columns['image'] ) ) : ?>
-								<th scope="col" class="manage-column column-thumb"><span class="wc-image tips"><?php esc_html_e( 'Image', 'store-toolkit-woocommerce' ); ?></span></th>
+								<th scope="col" class="manage-column column-thumb"><span class="wc-image tips"><?php esc_html_e( 'Image', 'store-toolkit' ); ?></span></th>
 							<?php endif; ?>
 
 							<th scope="col" class="manage-column column-name column-primary sortable <?php echo ( 'name' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-								<?php $this->print_column_header( 'name', __( 'Name', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
+								<?php $this->print_column_header( 'name', __( 'Name', 'store-toolkit' ), $orderby, $order ); ?>
 							</th>
 
 							<?php if ( ! empty( $columns['description'] ) ) : ?>
 								<th scope="col" class="manage-column column-description sortable <?php echo ( 'description' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'description', __( 'Description', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'description', __( 'Description', 'store-toolkit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['slug'] ) ) : ?>
 								<th scope="col" class="manage-column column-slug sortable <?php echo ( 'slug' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'slug', __( 'Slug', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'slug', __( 'Slug', 'store-toolkit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['count'] ) ) : ?>
 								<th scope="col" class="manage-column column-posts num sortable <?php echo ( 'count' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'count', __( 'Count', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'count', __( 'Count', 'store-toolkit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 						</tr>
@@ -359,10 +359,10 @@ class Store_Toolkit_Admin {
 										<td class="thumb column-thumb"><?php echo wp_kses_post( $image ); ?></td>
 									<?php endif; ?>
 
-									<td class="name column-name" data-colname="<?php esc_attr_e( 'Name', 'store-toolkit-woocommerce' ); ?>">
+									<td class="name column-name" data-colname="<?php esc_attr_e( 'Name', 'store-toolkit' ); ?>">
 										<strong><a href="<?php echo esc_url( get_term_link( $category ) ); ?>" target="_blank" class="row-title"><?php echo esc_html( $category->name ); ?></a></strong>
 										<div class="row-actions">
-											<span class="view"><a href="<?php echo esc_url( get_term_link( $category ) ); ?>" target="_blank"><?php esc_html_e( 'View', 'store-toolkit-woocommerce' ); ?></a></span>
+											<span class="view"><a href="<?php echo esc_url( get_term_link( $category ) ); ?>" target="_blank"><?php esc_html_e( 'View', 'store-toolkit' ); ?></a></span>
 											<span class="id">ID: <?php echo esc_html( $category->term_id ); ?></span>
 										</div>
 									</td>
@@ -384,7 +384,7 @@ class Store_Toolkit_Admin {
 						} else {
 							?>
 							<tr>
-								<td colspan="6"><?php esc_html_e( 'No categories found.', 'store-toolkit-woocommerce' ); ?></td>
+								<td colspan="6"><?php esc_html_e( 'No categories found.', 'store-toolkit' ); ?></td>
 							</tr>
 							<?php
 						}
@@ -395,28 +395,28 @@ class Store_Toolkit_Admin {
 							<td class="manage-column column-cb check-column"><input type="checkbox" /></td>
 							
 							<?php if ( ! empty( $columns['image'] ) ) : ?>
-								<th scope="col" class="manage-column column-thumb"><?php esc_html_e( 'Image', 'store-toolkit-woocommerce' ); ?></th>
+								<th scope="col" class="manage-column column-thumb"><?php esc_html_e( 'Image', 'store-toolkit' ); ?></th>
 							<?php endif; ?>
 
 							<th scope="col" class="manage-column column-name column-primary sortable <?php echo ( 'name' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-								<?php $this->print_column_header( 'name', __( 'Name', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
+								<?php $this->print_column_header( 'name', __( 'Name', 'store-toolkit' ), $orderby, $order ); ?>
 							</th>
 
 							<?php if ( ! empty( $columns['description'] ) ) : ?>
 								<th scope="col" class="manage-column column-description sortable <?php echo ( 'description' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'description', __( 'Description', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'description', __( 'Description', 'store-toolkit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['slug'] ) ) : ?>
 								<th scope="col" class="manage-column column-slug sortable <?php echo ( 'slug' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'slug', __( 'Slug', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'slug', __( 'Slug', 'store-toolkit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $columns['count'] ) ) : ?>
 								<th scope="col" class="manage-column column-posts num sortable <?php echo ( 'count' === $orderby ) ? esc_attr( $order ) : 'desc'; ?>">
-									<?php $this->print_column_header( 'count', __( 'Count', 'store-toolkit-woocommerce' ), $orderby, $order ); ?>
+									<?php $this->print_column_header( 'count', __( 'Count', 'store-toolkit' ), $orderby, $order ); ?>
 								</th>
 							<?php endif; ?>
 						</tr>
@@ -429,7 +429,7 @@ class Store_Toolkit_Admin {
 							<?php
 							printf(
 								/* translators: %s: Number of items */
-								esc_html( _n( '%s item', '%s items', $total_terms, 'store-toolkit-woocommerce' ) ),
+								esc_html( _n( '%s item', '%s items', $total_terms, 'store-toolkit' ) ),
 								esc_html( number_format_i18n( $total_terms ) )
 							);
 							?>

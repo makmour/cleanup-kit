@@ -8,7 +8,7 @@
  * Author URI:        https://wprepublic.com/
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       store-toolkit-woocommerce
+ * Text Domain:       store-toolkit
  * Domain Path:       /languages
  * Requires at least: 5.8
  * Tested up to: 6.9
@@ -113,8 +113,8 @@ final class Store_Toolkit {
 		?>
 		<div class="notice notice-error is-dismissible">
 			<p>
-				<strong><?php esc_html_e( 'Store Toolkit for WooCommerce', 'store-toolkit-woocommerce' ); ?></strong>
-				<?php esc_html_e( 'requires WooCommerce to be installed and activated.', 'store-toolkit-woocommerce' ); ?>
+				<strong><?php esc_html_e( 'Store Toolkit for WooCommerce', 'store-toolkit' ); ?></strong>
+				<?php esc_html_e( 'requires WooCommerce to be installed and activated.', 'store-toolkit' ); ?>
 			</p>
 		</div>
 		<?php
